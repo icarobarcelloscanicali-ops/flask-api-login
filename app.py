@@ -9,9 +9,21 @@ def create_app():
 
     # Pega a variável de ambiente corretamente
     DATABASE_URL = os.getenv("DATABASE_URL")
+    
+    # Corrige prefixo para psycopg2
+    if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
     if not DATABASE_URL:
         print("[WARN] DATABASE_URL não encontrada. Defina-a no painel do Railway → Settings → Variables.")
+    else:
+        # Testa conexão ao banco
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            conn.close()
+            print("[OK] Conexão com banco validada.")
+        except Exception as e:
+            print(f"[ERRO] Conexão com banco falhou: {e}")
 
     def get_conn():
         return psycopg2.connect(DATABASE_URL)
