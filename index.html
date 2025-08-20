@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Demo Flask + Ngrok</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login Demo Flask + Railway</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -27,7 +27,7 @@
             background: white; 
             padding: 20px; 
             border-radius: 10px; 
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1); 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
             width: 300px; 
         }
         input { 
@@ -56,16 +56,14 @@
     </style>
 </head>
 <body>
-    <!-- CAPA COM A IMAGEM -->
     <div class="header">
-        <img src="Captura de tela 2025-08-19 204103.png" alt="Capa Apple">
+        <img src="Captura de tela 2025-08-19 204103.png" alt="Capa Apple" />
     </div>
 
-    <!-- FORMULÁRIO DE LOGIN -->
     <div class="login-container">
         <h2>Login</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Senha">
+        <input type="email" id="email" placeholder="Email" />
+        <input type="password" id="password" placeholder="Senha" />
         <button onclick="login()">Entrar</button>
         <div class="message" id="message"></div>
     </div>
@@ -77,16 +75,16 @@
             const messageDiv = document.getElementById("message");
 
             try {
-                // Substitua NGROK_URL_AQUI pelo link que o ngrok gerar
-                const response = await fetch("https://b083c26dfac1.ngrok-free.app -> http://localhost:5000", {
+                const response = await fetch("https://postgres-production-98d6.up.railway.app/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ username: email, password: password })
                 });
 
                 const result = await response.json();
-                if (result.success) {
-                    messageDiv.innerHTML = "✅ Login bem-sucedido! Token: " + result.token;
+
+                if (result.status === "ok") {
+                    messageDiv.innerHTML = "✅ Login bem-sucedido! " + result.message;
                     messageDiv.style.color = "green";
                 } else {
                     messageDiv.innerHTML = "❌ " + result.message;

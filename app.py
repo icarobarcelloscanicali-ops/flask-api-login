@@ -7,12 +7,11 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # ✅ Corrigido: pega a variável de ambiente corretamente
+    # Pega a variável de ambiente corretamente
     DATABASE_URL = os.getenv("DATABASE_URL")
 
     if not DATABASE_URL:
-        print("[WARN] DATABASE_URL não encontrada nas variáveis de ambiente. "
-              "Defina-a no painel do Railway (Settings → Variables).")
+        print("[WARN] DATABASE_URL não encontrada. Defina-a no painel do Railway → Settings → Variables.")
 
     def get_conn():
         return psycopg2.connect(DATABASE_URL)
@@ -86,7 +85,7 @@ def create_app():
     init_db()
     return app
 
-# Inicializa o app
+# Objeto usado pelo Gunicorn
 app = create_app()
 
 if __name__ == "__main__":
