@@ -7,10 +7,10 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Pega a variável de ambiente corretamente
+    # Pega a variável de ambiente DATABASE_URL
     DATABASE_URL = os.getenv("DATABASE_URL")
-    
-    # Corrige prefixo para psycopg2
+
+    # Corrige prefixo para psycopg2 se necessário
     if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
@@ -26,6 +26,8 @@ def create_app():
             print(f"[ERRO] Conexão com banco falhou: {e}")
 
     def get_conn():
+        if not DATABASE_URL:
+            raise Exception("DATABASE_URL não configurada")
         return psycopg2.connect(DATABASE_URL)
 
     def init_db():
@@ -35,8 +37,8 @@ def create_app():
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
-                    username TEXT UNIQUE,
-                    password TEXT
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
                 )
             """)
             conn.commit()
@@ -94,11 +96,17 @@ def create_app():
         else:
             return jsonify({"status": "error", "message": "Credenciais inválidas"}), 401
 
-    init_db()
+    # Inicializa banco só se DATABASE_URL estiver configurada
+    if DATABASE_URL:
+        init_db()
+    else:
+        print("[WARN] Ignorando init_db porque DATABASE_URL não está configurada.")
+
     return app
 
 # Objeto usado pelo Gunicorn
 app = create_app()
 
 if __name__ == "__main__":
+    # Só roda localmente com app.run()
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")))
